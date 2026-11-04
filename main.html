@@ -36,6 +36,73 @@
 
 <script>
 //Your code goes here 
+	
+const container = document.querySelector(".items");
+const items = document.querySelectorAll(".item");
+
+let selectedItem = null;
+let offsetX = 0;
+let offsetY = 0;
+
+// Select an item
+items.forEach(item => {
+
+    item.addEventListener("mousedown", function(e) {
+
+        selectedItem = item;
+
+        const itemRect = item.getBoundingClientRect();
+
+        offsetX = e.clientX - itemRect.left;
+        offsetY = e.clientY - itemRect.top;
+
+        const containerRect = container.getBoundingClientRect();
+
+        item.style.position = "absolute";
+
+        item.style.left = (itemRect.left - containerRect.left) + "px";
+        item.style.top = (itemRect.top - containerRect.top) + "px";
+
+        item.style.zIndex = 100;
+
+    });
+
+});
+
+// Move selected item
+document.addEventListener("mousemove", function(e) {
+
+    if (selectedItem === null) {
+        return;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+
+    let x = e.clientX - containerRect.left - offsetX;
+    let y = e.clientY - containerRect.top - offsetY;
+
+    // Set boundaries
+    const maxX = container.clientWidth - selectedItem.offsetWidth;
+    const maxY = container.clientHeight - selectedItem.offsetHeight;
+
+    x = Math.max(0, Math.min(x, maxX));
+    y = Math.max(0, Math.min(y, maxY));
+
+    selectedItem.style.left = x + "px";
+    selectedItem.style.top = y + "px";
+
+});
+
+// Release item
+document.addEventListener("mouseup", function() {
+
+    if (selectedItem !== null) {
+        selectedItem.style.zIndex = 1;
+        selectedItem = null;
+    }
+
+});
+
 </script>
 
   </body>
