@@ -43,61 +43,47 @@ const items = document.querySelectorAll(".item");
 let selectedItem = null;
 let offsetX = 0;
 let offsetY = 0;
-
-// Select an item
 items.forEach(item => {
 
     item.addEventListener("mousedown", function(e) {
 
         selectedItem = item;
 
-        const itemRect = item.getBoundingClientRect();
+        const rect = item.getBoundingClientRect();
 
-        offsetX = e.clientX - itemRect.left;
-        offsetY = e.clientY - itemRect.top;
-
-        const containerRect = container.getBoundingClientRect();
-
-        item.style.position = "absolute";
-
-        item.style.left = (itemRect.left - containerRect.left) + "px";
-        item.style.top = (itemRect.top - containerRect.top) + "px";
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
 
         item.style.zIndex = 100;
-
     });
 
 });
 
-// Move selected item
 document.addEventListener("mousemove", function(e) {
 
-    if (selectedItem === null) {
-        return;
-    }
+    if (!selectedItem) return;
 
-    const containerRect = container.getBoundingClientRect();
+    const rect = selectedItem.parentElement.getBoundingClientRect();
 
-    let x = e.clientX - containerRect.left - offsetX;
-    let y = e.clientY - containerRect.top - offsetY;
+    let x = e.clientX - rect.left - offsetX;
+    let y = e.clientY - rect.top - offsetY;
 
-    // Set boundaries
-    const maxX = container.clientWidth - selectedItem.offsetWidth;
-    const maxY = container.clientHeight - selectedItem.offsetHeight;
+    const itemRect = selectedItem.getBoundingClientRect();
 
-    x = Math.max(0, Math.min(x, maxX));
-    y = Math.max(0, Math.min(y, maxY));
+    x = Math.max(0, Math.min(x, rect.width - itemRect.width));
+    y = Math.max(0, Math.min(y, rect.height - itemRect.height));
 
-    selectedItem.style.left = x + "px";
-    selectedItem.style.top = y + "px";
+    const originalRect = selectedItem.getBoundingClientRect();
 
+    selectedItem.style.transform =
+        `translate(${x - (originalRect.left - rect.left)}px,
+                    ${y - (originalRect.top - rect.top)}px)`;
 });
 
-// Release item
 document.addEventListener("mouseup", function() {
 
-    if (selectedItem !== null) {
-        selectedItem.style.zIndex = 1;
+    if (selectedItem) {
+        selectedItem.style.zIndex = "";
         selectedItem = null;
     }
 
